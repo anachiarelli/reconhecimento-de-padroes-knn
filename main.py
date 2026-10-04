@@ -1,10 +1,10 @@
+import os
 import sys
 import sklearn
 import numpy as np
 from sklearn.datasets import load_iris, load_digits, load_breast_cancer
 
 r1, r2, r3 = map(float, sys.argv[1:4])
-print(r1, r2, r3)
 
 loaders = [
     ("Iris", load_iris),
@@ -35,8 +35,15 @@ for dataset_name, loader in loaders:
         Z2.extend([(d, target) for d in data_points[n1:n1+n2]])
         Z3.extend([(d, target) for d in data_points[n1+n2:]])
 
-    print(f"Dataset: {dataset_name}")
-    print(f"Z1: {len(Z1)} samples")
-    print(f"Z2: {len(Z2)} samples")
-    print(f"Z3: {len(Z3)} samples")
+    # save Z1, Z2, Z3 to files
+    os.makedirs("./datasets", exist_ok=True)
+    with open(f"./datasets/{dataset_name}_Z1.npy", "w") as f:
+        for data, target in Z1:
+            f.write(",".join(map(str, data)) + f",{target}\n")
+    with open(f"./datasets/{dataset_name}_Z2.npy", "w") as f:
+        for data, target in Z2:
+            f.write(",".join(map(str, data)) + f",{target}\n")
+    with open(f"./datasets/{dataset_name}_Z3.npy", "w") as f:
+        for data, target in Z3:
+            f.write(",".join(map(str, data)) + f",{target}\n")
     
