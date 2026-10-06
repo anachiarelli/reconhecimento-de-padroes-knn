@@ -1,6 +1,6 @@
 import os
 import sys
-from sklearn.datasets import load_iris, load_digits, load_breast_cancer
+from sklearn.datasets import load_iris, load_digits, load_breast_cancer, load_wine
 
 if __name__=='__main__':
     r1, r2, r3 = map(float, sys.argv[1:4])
@@ -8,7 +8,8 @@ if __name__=='__main__':
     loaders = [
         ("Iris", load_iris),
         ("Digits", load_digits),
-        ("Breast Cancer", load_breast_cancer)
+        ("Breast Cancer", load_breast_cancer),
+        ("Wine", load_wine)
     ]
 
     for dataset_name, loader in loaders:

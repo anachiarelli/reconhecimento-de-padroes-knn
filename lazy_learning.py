@@ -4,7 +4,7 @@ from lib.shared import predict, calculate_error
 
 if __name__=='__main__':
 
-    datasets = ["Iris", "Digits", "Breast Cancer"]
+    datasets = ["Iris", "Digits", "Breast Cancer", "Wine"]
 
     for dataset_name in datasets:
         # Load the datasets from the files
@@ -45,17 +45,21 @@ if __name__=='__main__':
 
         # get the k with the minimum error rate
         best_k = min_k + min_error_index * 2
+        print(best_k)
 
-        # Divide Z3 into 20 random subsets and calculate the error rate for each subset using the best k
-        subset_size = len(Z3_loaded) // 2
+        # Generate 20 random subsets of the whole dataset (Z1 + Z2 + Z3) with Z3 length and calculate the error rate for each subset
+        subset_size = len(Z3_loaded)
+        all_data = Z1_loaded + Z2_loaded + Z3_loaded
+
         subset_error_rates = []
         for i in range(20):
-            subset = random.sample(Z3_loaded, subset_size)
+            subset = random.sample(all_data, subset_size)
             predictions = predict(Z1_loaded, subset, best_k)
             true_labels = [t[1] for t in subset]
-            subset_error_rates.append(calculate_error(predictions, true_labels))
+            error_rate = calculate_error(predictions, true_labels)
+            subset_error_rates.append(error_rate)
 
         # Calculate the average error rate across all subsets
         average_error_rate = statistics.mean(subset_error_rates)
         std_dev_error_rate = statistics.stdev(subset_error_rates)
-        print(f"Dataset: {dataset_name}, Best k: {best_k}, Average Error Rate: {average_error_rate:.4f}, Standard Deviation: {std_dev_error_rate:.4f}")
+        print(f"Dataset: {dataset_name}, Average Error Rate: {average_error_rate:.4f}, Standard Deviation: {std_dev_error_rate:.4f}")
