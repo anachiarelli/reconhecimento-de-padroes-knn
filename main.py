@@ -1,8 +1,9 @@
 import os
 import sys
 from sklearn.datasets import load_iris, load_digits, load_breast_cancer, load_wine
+from sklearn.preprocessing import StandardScaler
 
-if __name__=='__main__':
+if __name__ == '__main__':
     r1, r2, r3 = map(float, sys.argv[1:4])
 
     loaders = [
@@ -23,8 +24,9 @@ if __name__=='__main__':
                 data_by_target[target] = []
             data_by_target[target].append(data)
 
-        # Split the data into three parts based on the specified ratios (stratified sampling)
+        # Split the data into three parts based on the specified ratios
         Z1, Z2, Z3 = [], [], []
+
         for target, data_points in data_by_target.items():
             n = len(data_points)
             n1 = int(n * r1)
@@ -35,14 +37,32 @@ if __name__=='__main__':
             Z2.extend([(d, target) for d in data_points[n1:n1+n2]])
             Z3.extend([(d, target) for d in data_points[n1+n2:]])
 
-        # save Z1, Z2, Z3 to files
+        # Normalize using only Z1
+        scaler = StandardScaler()
+
+        Z1_X = [data for data, target in Z1]
+        Z2_X = [data for data, target in Z2]
+        Z3_X = [data for data, target in Z3]
+
+        Z1_X = scaler.fit_transform(Z1_X)
+        Z2_X = scaler.transform(Z2_X)
+        Z3_X = scaler.transform(Z3_X)
+
+        Z1 = [(data, target) for data, (_, target) in zip(Z1_X, Z1)]
+        Z2 = [(data, target) for data, (_, target) in zip(Z2_X, Z2)]
+        Z3 = [(data, target) for data, (_, target) in zip(Z3_X, Z3)]
+
+        # Save Z1, Z2, Z3 to files
         os.makedirs("./datasets", exist_ok=True)
+
         with open(f"./datasets/{dataset_name}_Z1.txt", "w") as f:
             for data, target in Z1:
                 f.write(",".join(map(str, data)) + f",{target}\n")
+
         with open(f"./datasets/{dataset_name}_Z2.txt", "w") as f:
             for data, target in Z2:
                 f.write(",".join(map(str, data)) + f",{target}\n")
+
         with open(f"./datasets/{dataset_name}_Z3.txt", "w") as f:
             for data, target in Z3:
                 f.write(",".join(map(str, data)) + f",{target}\n")
